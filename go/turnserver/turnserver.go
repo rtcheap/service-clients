@@ -7,6 +7,7 @@ import (
 	"github.com/CzarSimon/httputil/client"
 	"github.com/CzarSimon/httputil/jwt"
 	"github.com/opentracing/opentracing-go"
+	tracelog "github.com/opentracing/opentracing-go/log"
 	"github.com/rtcheap/dto"
 )
 
