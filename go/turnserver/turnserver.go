@@ -10,14 +10,14 @@ import (
 	"github.com/rtcheap/dto"
 )
 
-// Client client interface for interacting with the turn-server session api.
+// Client interface for interacting with the turn-server session api.
 type Client interface {
 	Register(ctx context.Context, baseURL string, session dto.Session) error
 	Unregister(ctx context.Context, baseURL, userID string) error
-	GetStatistics(ctx context.Context, baseURL string) error
+	GetStatistics(ctx context.Context, baseURL string) (dto.SessionStatistics, error)
 }
 
-// NewClient creates a new client using the default implementatino.
+// NewClient creates a new turnserver client using the default implementation.
 func NewClient(httpClient client.Client) Client {
 	if httpClient.Role == "" {
 		httpClient.Role = jwt.SystemRole

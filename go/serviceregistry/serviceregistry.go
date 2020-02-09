@@ -11,7 +11,7 @@ import (
 	"github.com/rtcheap/dto"
 )
 
-// Client client interface for interacting with the service-registry service.
+// Client interface for interacting with the service-registry api.
 type Client interface {
 	Register(ctx context.Context, svc dto.Service) (dto.Service, error)
 	Find(ctx context.Context, id string) (dto.Service, error)
@@ -19,7 +19,7 @@ type Client interface {
 	SetStatus(ctx context.Context, id string, status dto.ServiceStatus) error
 }
 
-// NewClient creates a new client using the default implementatino.
+// NewClient creates a new client using the default implementation.
 func NewClient(httpClient client.Client) Client {
 	if httpClient.Role == "" {
 		httpClient.Role = jwt.SystemRole
