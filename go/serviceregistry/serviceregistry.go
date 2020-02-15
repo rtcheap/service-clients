@@ -38,39 +38,37 @@ type restClient struct {
 }
 
 func (c *restClient) Register(ctx context.Context, svc dto.Service) (dto.Service, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "serviceregistry.restClient.Register")
+	span, ctx := opentracing.StartSpanFromContext(ctx, "serviceregistry_rest_client_register")
 	defer span.Finish()
 
 	var registeredService dto.Service
 	err := c.http.Post(ctx, "/v1/services", svc, &registeredService)
 	if err != nil {
 		err = fmt.Errorf("failed to register service. %w", err)
-		span.LogFields(tracelog.Bool("success", false), tracelog.Error(err))
+		span.LogFields(tracelog.Error(err))
 		return dto.Service{}, err
 	}
 
-	span.LogFields(tracelog.Bool("success", true))
 	return registeredService, nil
 }
 
 func (c *restClient) Find(ctx context.Context, id string) (dto.Service, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "serviceregistry.restClient.Find")
+	span, ctx := opentracing.StartSpanFromContext(ctx, "serviceregistry_rest_client_find")
 	defer span.Finish()
 
 	var svc dto.Service
 	err := c.http.Get(ctx, "/v1/services/"+id, &svc)
 	if err != nil {
 		err = fmt.Errorf("failed to find service(id=%s). %w", id, err)
-		span.LogFields(tracelog.Bool("success", false), tracelog.Error(err))
+		span.LogFields(tracelog.Error(err))
 		return dto.Service{}, err
 	}
 
-	span.LogFields(tracelog.Bool("success", true))
 	return svc, nil
 }
 
 func (c *restClient) FindByApplication(ctx context.Context, application string, onlyHealthy bool) ([]dto.Service, error) {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "serviceregistry.restClient.FindByApplication")
+	span, ctx := opentracing.StartSpanFromContext(ctx, "serviceregistry_rest_client_find_by_application")
 	defer span.Finish()
 
 	services := make([]dto.Service, 0)
@@ -78,26 +76,24 @@ func (c *restClient) FindByApplication(ctx context.Context, application string, 
 	err := c.http.Get(ctx, path, &services)
 	if err != nil {
 		err = fmt.Errorf("failed to find service for application = %s. %w", application, err)
-		span.LogFields(tracelog.Bool("success", false), tracelog.Error(err))
+		span.LogFields(tracelog.Error(err))
 		return nil, err
 	}
 
-	span.LogFields(tracelog.Bool("success", true))
 	return services, nil
 }
 
 func (c *restClient) SetStatus(ctx context.Context, id string, status dto.ServiceStatus) error {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "serviceregistry.restClient.SetStatus")
+	span, ctx := opentracing.StartSpanFromContext(ctx, "serviceregistry_rest_client_set_status")
 	defer span.Finish()
 
 	path := fmt.Sprintf("/v1/services/%s/status/%s", id, status)
 	err := c.http.Put(ctx, path, nil, nil)
 	if err != nil {
 		err = fmt.Errorf("failed to set status %s for service(id=%s). %w", status, id, err)
-		span.LogFields(tracelog.Bool("success", false), tracelog.Error(err))
+		span.LogFields(tracelog.Error(err))
 		return err
 	}
 
-	span.LogFields(tracelog.Bool("success", true))
 	return nil
 }

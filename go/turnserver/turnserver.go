@@ -38,39 +38,37 @@ type restClient struct {
 }
 
 func (c *restClient) Register(ctx context.Context, baseURL string, session dto.Session) error {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "turnserver.restClient.Register")
+	span, ctx := opentracing.StartSpanFromContext(ctx, "turnserver_rest_client_register")
 	defer span.Finish()
 
 	url := fmt.Sprintf("%s/v1/sessions", baseURL)
 	err := c.http.Post(ctx, url, session, nil)
 	if err != nil {
 		err = fmt.Errorf("failed to register %s. %w", session, err)
-		span.LogFields(tracelog.Bool("success", false), tracelog.Error(err))
+		span.LogFields(tracelog.Error(err))
 		return err
 	}
 
-	span.LogFields(tracelog.Bool("success", true))
 	return nil
 }
 
 func (c *restClient) Unregister(ctx context.Context, baseURL, userID string) error {
-	span, ctx := opentracing.StartSpanFromContext(ctx, "turnserver.restClient.Unregister")
+	span, ctx := opentracing.StartSpanFromContext(ctx, "turnserver_rest_client_unregister")
 	defer span.Finish()
 
 	url := fmt.Sprintf("%s/v1/sessions/%s", baseURL, userID)
 	err := c.http.Delete(ctx, url, nil)
 	if err != nil {
 		err = fmt.Errorf("failed to unregister user(id=%s). %w", userID, err)
-		span.LogFields(tracelog.Bool("success", false), tracelog.Error(err))
+		span.LogFields(tracelog.Error(err))
 		return err
 	}
 
-	span.LogFields(tracelog.Bool("success", true))
 	return nil
 }
 
 func (c *restClient) GetStatistics(ctx context.Context, baseURL string) (dto.SessionStatistics, error) {
-	span, _ := opentracing.StartSpanFromContext(ctx, "turnserver.restClient.GetStatistics")
+	span, _ := opentracing.StartSpanFromContext(ctx, "turnserver_rest_client_get_statistics")
 	defer span.Finish()
 
 	var stats dto.SessionStatistics
@@ -78,10 +76,9 @@ func (c *restClient) GetStatistics(ctx context.Context, baseURL string) (dto.Ses
 	err := c.http.Get(ctx, url, &stats)
 	if err != nil {
 		err = fmt.Errorf("failed to retrieve turn-server session statistics. %w", err)
-		span.LogFields(tracelog.Bool("success", false), tracelog.Error(err))
+		span.LogFields(tracelog.Error(err))
 		return dto.SessionStatistics{}, err
 	}
 
-	span.LogFields(tracelog.Bool("success", true))
 	return stats, nil
 }
